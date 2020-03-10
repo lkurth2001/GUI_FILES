@@ -24,6 +24,7 @@ class MyFrame(wx.Frame):
       self.selectedItems=list()
       
       self._bt_all = wx.Button(self,label="Select All",name=self.GetName()+".BT.ALL")
+      self._bt_print = wx.Button(self,label="Print",name=self.GetName()+".BT.PRINT")
       
       self.Bind(wx.EVT_BUTTON,self.ClickOnButton)
       
@@ -54,6 +55,7 @@ class MyFrame(wx.Frame):
       
       myBoxGridSizer.Add(self.mListBox,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       myBoxGridSizer.Add(self._bt_all,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
+      myBoxGridSizer.Add(self._bt_print,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       
       myFlexGridSizer.Add(myBoxGridSizer,1,wx.EXPAND,5)
       
@@ -63,6 +65,8 @@ class MyFrame(wx.Frame):
       self.Centre(wx.BOTH)
       
       self._maxFiles=self.mListBox.GetCount()
+      
+      
    
    def select(self,event):
     """Simulate CTRL-click"""
@@ -105,6 +109,9 @@ class MyFrame(wx.Frame):
          self.selectAll(event)
       elif obj.GetLabel()=="Deselect All":
          self.deselectAll(event)
+      elif obj.GetName().endswith(".BT.PRINT"):
+         for i in self.selectedItems:
+            print(self.mListBox.GetString(i))
       
       
 if __name__ == "__main__":
