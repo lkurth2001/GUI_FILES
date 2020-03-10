@@ -23,6 +23,10 @@ class MyFrame(wx.Frame):
       
       self.selectedItems=list()
       
+      self._bt_all = wx.Button(self,label="Select All",name=self.GetName()+".BT.ALL")
+      
+      self.Bind(wx.EVT_BUTTON,self.ClickOnButton)
+      
       self.SetSizeHints(wx.DefaultSize,wx.DefaultSize)
       self.SetBackgroundColour(wx.Colour(0,128,128))
       
@@ -49,6 +53,7 @@ class MyFrame(wx.Frame):
       self.mListBox.Bind(wx.EVT_LISTBOX,self.select)
       
       myBoxGridSizer.Add(self.mListBox,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
+      myBoxGridSizer.Add(self._bt_all,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       
       myFlexGridSizer.Add(myBoxGridSizer,1,wx.EXPAND,5)
       
@@ -76,13 +81,30 @@ class MyFrame(wx.Frame):
         # actually select all the items in the list
         self.mListBox.Select(i)
         
+    if len(self.selectedItems)==self._maxFiles:
+        self._bt_all.SetLabel("Deselect All")
+    else:
+        self._bt_all.SetLabel("Select All")
+        
+        
    def selectAll(self,event):
       for i in range(self.mListBox.GetCount()):
-         self.mListBox.SetSelect(i)
+         self.mListBox.SetSelection(i)
+         self.selectedItems.append(i)
+      self._bt_all.SetLabel("Deselect All")
    
-   def unselectAll(self,event):
+   def deselectAll(self,event):
       for i in self.selectedItems:
          self.mListBox.Deselect(i)
+      self.selectedItems.clear()
+      self._bt_all.SetLabel("Select All")
+      
+   def ClickOnButton(self,event):
+      obj=event.GetEventObject()
+      if obj.GetLabel()=="Select All":
+         self.selectAll(event)
+      elif obj.GetLabel()=="Deselect All":
+         self.deselectAll(event)
       
       
 if __name__ == "__main__":
