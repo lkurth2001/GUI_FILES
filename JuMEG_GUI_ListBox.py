@@ -23,7 +23,7 @@ class MyFrame(wx.Frame):
       
       self.selectedItems=list()
       
-      self.SetSizeHintsSz(wx.DefaultSize,wx.DefaultSize)
+      self.SetSizeHints(wx.DefaultSize,wx.DefaultSize)
       self.SetBackgroundColour(wx.Colour(0,128,128))
       
       myFlexGridSizer = wx.FlexGridSizer(1,1,0,0)
@@ -56,11 +56,12 @@ class MyFrame(wx.Frame):
       self.Layout()
       
       self.Centre(wx.BOTH)
+      
+      self._maxFiles=self.mListBox.GetCount()
    
    def select(self,event):
     """Simulate CTRL-click"""
     selection = self.mListBox.GetSelections()
-
     for i in selection:
         if i not in self.selectedItems:
             # add to list of selected items
@@ -74,6 +75,15 @@ class MyFrame(wx.Frame):
     for i in self.selectedItems:
         # actually select all the items in the list
         self.mListBox.Select(i)
+        
+   def selectAll(self,event):
+      for i in range(self.mListBox.GetCount()):
+         self.mListBox.SetSelect(i)
+   
+   def unselectAll(self,event):
+      for i in self.selectedItems:
+         self.mListBox.Deselect(i)
+      
       
 if __name__ == "__main__":
    app=MyApp(False)
