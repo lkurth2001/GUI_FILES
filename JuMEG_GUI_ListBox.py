@@ -21,7 +21,20 @@ class MyFrame(wx.Frame):
    def __init__(self,parent):
       wx.Frame.__init__(self,parent,id=wx.ID_ANY,title="JuMEG ListBox",pos=wx.DefaultPosition, size=wx.Size(500,400),style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
       
+      reader=Txt_Reader()
+      mListBoxChoices = reader.read_file("intext_meeg_filelist.txt")    
+      
+      self.mListBox = wx.ListBox(self,wx.ID_ANY,wx.Point(-1,-1),wx.Size(300,300),mListBoxChoices,wx.LB_MULTIPLE) 
+      self.mListBox.SetFont(wx.Font(12,75,90,90,False,wx.EmptyString))
+      
+      self.mListBox.Bind(wx.EVT_LISTBOX,self.select)
+      
+      self._maxFiles=self.mListBox.GetCount()
+      
+      self.counter=0
       self.selectedItems=list()
+      
+      self.counter_text=wx.StaticText(self, wx.ID_ANY,(str)(self.counter)+"/"+(str)(self._maxFiles),wx.Point(-1,-1),wx.DefaultSize,0)
       
       self._bt_all = wx.Button(self,label="Select All",name=self.GetName()+".BT.ALL")
       self._bt_print = wx.Button(self,label="Print",name=self.GetName()+".BT.PRINT")
@@ -43,19 +56,9 @@ class MyFrame(wx.Frame):
       self.headerLabel.SetFont(wx.Font(wx.NORMAL_FONT.GetPointSize(),75,90,92,True,wx.EmptyString))
       myBoxGridSizer.Add(self.headerLabel,0,wx.ALL | wx.ALIGN_CENTER_HORIZONTAL,5)
       
-      reader=Txt_Reader()
-      mListBoxChoices = reader.read_file("intext_meeg_filelist.txt")    
-      
-      self.mListBox = wx.ListBox(self,wx.ID_ANY,wx.Point(-1,-1),wx.Size(300,300),mListBoxChoices,wx.LB_MULTIPLE) 
-      self.mListBox.SetFont(wx.Font(12,75,90,90,False,wx.EmptyString))
-      
-      """self.mListBox.SetSelection(n=3)
-      self.mListBox.SetSelection(n=5)"""
-      self.mListBox.Bind(wx.EVT_LISTBOX,self.select)
-      
       myBoxGridSizer.Add(self.mListBox,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
-      myBoxGridSizer.Add(self._bt_all,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
-      myBoxGridSizer.Add(self._bt_print,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
+      myBoxGridSizer.Add(self._bt_all,0,wx.ALIGN_CENTER_VERTICAL | wx.ALL,5)
+      myBoxGridSizer.Add(self._bt_print,0,wx.ALIGN_CENTER_VERTICAL| wx.ALL,5)
       
       myFlexGridSizer.Add(myBoxGridSizer,1,wx.EXPAND,5)
       
@@ -64,9 +67,9 @@ class MyFrame(wx.Frame):
       
       self.Centre(wx.BOTH)
       
-      self._maxFiles=self.mListBox.GetCount()
       
-      
+   def update_counter_text(self):
+      self.counter_text.SetLabel((str)(self.counter)+"/"+(str)(self._maxFiles))
    
    def select(self,event):
     """Simulate CTRL-click"""
@@ -76,10 +79,12 @@ class MyFrame(wx.Frame):
             # add to list of selected items
             self.selectedItems.append(i)
             self.mListBox.Select(i)
+            self.counter+=1
         elif len(selection) == 1:
             # remove from list of selected items
             self.selectedItems.remove(i)
             self.mListBox.Deselect(i)
+            self.counter-=1
 
     for i in self.selectedItems:
         # actually select all the items in the list
@@ -89,6 +94,7 @@ class MyFrame(wx.Frame):
         self._bt_all.SetLabel("Deselect All")
     else:
         self._bt_all.SetLabel("Select All")
+    self.update_counter_text()
         
         
    def selectAll(self,event):
@@ -96,12 +102,16 @@ class MyFrame(wx.Frame):
          self.mListBox.SetSelection(i)
          self.selectedItems.append(i)
       self._bt_all.SetLabel("Deselect All")
+      self.counter=self._maxFiles
+      self.update_counter_text()
    
    def deselectAll(self,event):
       for i in self.selectedItems:
          self.mListBox.Deselect(i)
       self.selectedItems.clear()
       self._bt_all.SetLabel("Select All")
+      self.counter=0
+      self.update_counter_text()
       
    def ClickOnButton(self,event):
       obj=event.GetEventObject()
