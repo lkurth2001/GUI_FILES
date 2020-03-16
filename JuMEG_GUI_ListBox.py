@@ -21,8 +21,8 @@ class MyFrame(wx.Frame):
    def __init__(self,parent):
       wx.Frame.__init__(self,parent,id=wx.ID_ANY,title="JuMEG ListBox",pos=wx.DefaultPosition, size=wx.Size(500,400),style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
       
-      reader=Txt_Reader()
-      mListBoxChoices = reader.read_file("intext_meeg_filelist.txt")    
+      self.reader=Txt_Reader()
+      mListBoxChoices = self.reader.read_file("intext_meeg_filelist.txt")    
       
       self.mListBox = wx.ListBox(self,wx.ID_ANY,wx.Point(-1,-1),wx.Size(300,300),mListBoxChoices,wx.LB_MULTIPLE) 
       self.mListBox.SetFont(wx.Font(12,75,90,90,False,wx.EmptyString))
@@ -35,9 +35,11 @@ class MyFrame(wx.Frame):
       self.selectedItems=list()
       
       self.counter_text=wx.StaticText(self, wx.ID_ANY,(str)(self.counter)+"/"+(str)(self._maxFiles),wx.Point(-1,-1),wx.DefaultSize,0)
+      self.counter_text.SetForegroundColour('red')
       
       self._bt_all = wx.Button(self,label="Select All",name=self.GetName()+".BT.ALL")
       self._bt_print = wx.Button(self,label="Print",name=self.GetName()+".BT.PRINT")
+      self._bt_del = wx.Button(self,label="Delete Selected",name=self.GetName()+".BT.DEL")
       
       self.Bind(wx.EVT_BUTTON,self.ClickOnButton)
       
@@ -59,6 +61,7 @@ class MyFrame(wx.Frame):
       myBoxGridSizer.Add(self.mListBox,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       myBoxGridSizer.Add(self._bt_all,0,wx.ALIGN_CENTER_VERTICAL | wx.ALL,5)
       myBoxGridSizer.Add(self._bt_print,0,wx.ALIGN_CENTER_VERTICAL| wx.ALL,5)
+      myBoxGridSizer.Add(self._bt_del,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       
       myFlexGridSizer.Add(myBoxGridSizer,1,wx.EXPAND,5)
       
@@ -69,6 +72,7 @@ class MyFrame(wx.Frame):
       
       
    def update_counter_text(self):
+      self._maxFiles=self.mListBox.GetCount()
       self.counter_text.SetLabel((str)(self.counter)+"/"+(str)(self._maxFiles))
    
    def select(self,event):
@@ -97,7 +101,7 @@ class MyFrame(wx.Frame):
     self.update_counter_text()
         
         
-   def selectAll(self,event):
+   def selectAll(self):
       for i in range(self.mListBox.GetCount()):
          self.mListBox.SetSelection(i)
          self.selectedItems.append(i)
@@ -105,7 +109,7 @@ class MyFrame(wx.Frame):
       self.counter=self._maxFiles
       self.update_counter_text()
    
-   def deselectAll(self,event):
+   def deselectAll(self):
       for i in self.selectedItems:
          self.mListBox.Deselect(i)
       self.selectedItems.clear()
@@ -113,6 +117,17 @@ class MyFrame(wx.Frame):
       self.counter=0
       self.update_counter_text()
       
+   def deleteSelectedItems(self):
+      if len(self.selectedItems)==0:
+         pass
+      else:
+         selection=self.mListBox.GetSelections()
+         for i in selection:
+            self.mListBox.Delete(i)
+            self.reader._file_list.pop(i)
+            selection=self.mListBox.GetSelections()
+         self.deselectAll()
+            
    def ClickOnButton(self,event):
       obj=event.GetEventObject()
       if obj.GetLabel()=="Select All":
@@ -121,7 +136,10 @@ class MyFrame(wx.Frame):
          self.deselectAll(event)
       elif obj.GetName().endswith(".BT.PRINT"):
          for i in self.selectedItems:
+            print(self.reader._file_list[i])
             print(self.mListBox.GetString(i))
+      elif obj.GetName().endswith(".BT.DEL"):
+         self.deleteSelectedItems()
       
       
 if __name__ == "__main__":
