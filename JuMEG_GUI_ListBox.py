@@ -40,6 +40,7 @@ class MyFrame(wx.Frame):
       self._bt_all = wx.Button(self,label="Select All",name=self.GetName()+".BT.ALL")
       self._bt_print = wx.Button(self,label="Print",name=self.GetName()+".BT.PRINT")
       self._bt_del = wx.Button(self,label="Delete Selected",name=self.GetName()+".BT.DEL")
+      self._bt_clear = wx.Button(self,label="Clear",name=self.GetName()+".BT.CLEAR")
       
       self.Bind(wx.EVT_BUTTON,self.ClickOnButton)
       
@@ -61,7 +62,8 @@ class MyFrame(wx.Frame):
       myBoxGridSizer.Add(self.mListBox,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       myBoxGridSizer.Add(self._bt_all,0,wx.ALIGN_CENTER_VERTICAL | wx.ALL,5)
       myBoxGridSizer.Add(self._bt_print,0,wx.ALIGN_CENTER_VERTICAL| wx.ALL,5)
-      myBoxGridSizer.Add(self._bt_del,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
+      myBoxGridSizer.Add(self._bt_del,0,wx.ALIGN_CENTER_VERTICAL | wx.ALL,5)
+      myBoxGridSizer.Add(self._bt_clear,0,wx.ALIGN_CENTER_VERTICAL | wx.ALL,5)
       
       myFlexGridSizer.Add(myBoxGridSizer,1,wx.EXPAND,5)
       
@@ -110,7 +112,7 @@ class MyFrame(wx.Frame):
       self.update_counter_text()
    
    def deselectAll(self):
-      for i in self.selectedItems:
+      for i in self.mListBox.GetSelections():
          self.mListBox.Deselect(i)
       self.selectedItems.clear()
       self._bt_all.SetLabel("Select All")
@@ -122,16 +124,20 @@ class MyFrame(wx.Frame):
          pass
       else:
          selection=self.mListBox.GetSelections()
+         selection.sort(reverse=True)
          for i in selection:
             self.mListBox.Delete(i)
             self.reader._file_list.pop(i)
-            selection=self.mListBox.GetSelections()
          self.deselectAll()
+         
+   def deleteAll(self):
+      self.selectAll()
+      self.deleteSelectedItems()
             
    def ClickOnButton(self,event):
       obj=event.GetEventObject()
       if obj.GetLabel()=="Select All":
-         self.selectAll(event)
+         self.selectAll()
       elif obj.GetLabel()=="Deselect All":
          self.deselectAll(event)
       elif obj.GetName().endswith(".BT.PRINT"):
@@ -140,6 +146,8 @@ class MyFrame(wx.Frame):
             print(self.mListBox.GetString(i))
       elif obj.GetName().endswith(".BT.DEL"):
          self.deleteSelectedItems()
+      elif obj.GetName().endswith("BT.CLEAR"):
+         self.deleteAll()
       
       
 if __name__ == "__main__":
