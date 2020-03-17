@@ -27,7 +27,10 @@ class MyFrame(wx.Frame):
       self.mListBox = wx.ListBox(self,wx.ID_ANY,wx.Point(-1,-1),wx.Size(300,300),mListBoxChoices,wx.LB_MULTIPLE) 
       self.mListBox.SetFont(wx.Font(12,75,90,90,False,wx.EmptyString))
       
+      self.mListBox.SetToolTip("ListBox")
+      
       self.mListBox.Bind(wx.EVT_LISTBOX,self.select)
+      self.mListBox.Bind(wx.EVT_MOTION,self.OnMouseMove)
       
       self._maxFiles=self.mListBox.GetCount()
       
@@ -73,18 +76,15 @@ class MyFrame(wx.Frame):
       self.Centre(wx.BOTH)
       
     
-   """def OnMouseMove(self, event):
-        Event handler for mouse move event. Updates current position of cursor in data coordinates.
+   def OnMouseMove(self, event):
+        # Event handler for mouse move event. Updates current position of cursor in data coordinates.
         
         event.Skip()
         # get mouse position in window
         self.mousePos = self.ScreenToClient(wx.GetMousePosition())
         x, y = self.mousePos.Get()
         if self.mListBox.HitTest(x,y)!=wx.NOT_FOUND:
-         self.mListBox.SetToolTip("ListBox")
-         print("test1")
-         
-        print("test2")"""
+         self.mListBox.SetToolTip(self.reader._file_list[self.mListBox.HitTest(x,y)])
         
    def update_counter_text(self):
       self._maxFiles=self.mListBox.GetCount()
