@@ -72,7 +72,20 @@ class MyFrame(wx.Frame):
       
       self.Centre(wx.BOTH)
       
-      
+    
+   """def OnMouseMove(self, event):
+        Event handler for mouse move event. Updates current position of cursor in data coordinates.
+        
+        event.Skip()
+        # get mouse position in window
+        self.mousePos = self.ScreenToClient(wx.GetMousePosition())
+        x, y = self.mousePos.Get()
+        if self.mListBox.HitTest(x,y)!=wx.NOT_FOUND:
+         self.mListBox.SetToolTip("ListBox")
+         print("test1")
+         
+        print("test2")"""
+        
    def update_counter_text(self):
       self._maxFiles=self.mListBox.GetCount()
       self.counter_text.SetLabel((str)(self.counter)+"/"+(str)(self._maxFiles))
@@ -143,7 +156,6 @@ class MyFrame(wx.Frame):
       elif obj.GetName().endswith(".BT.PRINT"):
          for i in self.selectedItems:
             print(self.reader._file_list[i])
-            print(self.mListBox.GetString(i))
       elif obj.GetName().endswith(".BT.DEL"):
          self.deleteSelectedItems()
       elif obj.GetName().endswith("BT.CLEAR"):
