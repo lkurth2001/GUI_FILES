@@ -84,7 +84,7 @@ class MyFrame(wx.Frame):
         self.mousePos = self.ScreenToClient(wx.GetMousePosition())
         x, y = self.mousePos.Get()
         if self.mListBox.HitTest(x,y)!=wx.NOT_FOUND:
-         self.mListBox.SetToolTip(self.reader._file_list[self.mListBox.HitTest(x,y)])
+         self.mListBox.SetToolTip(self.reader._file_list[self.mListBox.HitTest(x,y)-1])
         
    def update_counter_text(self):
       self._maxFiles=self.mListBox.GetCount()
