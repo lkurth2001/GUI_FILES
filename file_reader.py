@@ -24,6 +24,8 @@ class Txt_Reader():
          
    
    def read_file(self, fname):
+      self._file_list=list()
+      self.edited_list=list()
       with open(fname,"r") as f:
          f=self.split_lines_by_comma(f)
          return f
