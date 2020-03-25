@@ -31,7 +31,9 @@ class LbBtPanel(wx.Panel):
           myListBoxSizer.Add(myButtonSizer,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL | wx.EXPAND,5)
           self.SetSizer(myListBoxSizer)
       else:
-          self.updateChoices(self.GetParent().GetParent().OnOpen())
+          fname=self.GetParent().GetParent().OnOpen()
+          choices=self.GetParent().GetParent().reader.read_file(fname)
+          self.updateChoices(choices)
       
    def updateChoices(self,choices):
       myListBoxSizer=wx.BoxSizer(wx.VERTICAL)
@@ -74,6 +76,12 @@ class MyFrame(wx.Frame):
       
       self.Splitter=wx.SplitterWindow(self)
       
+      self.counter=0
+      self.selectedItems=list()
+      
+      self.counter_text=wx.StaticText(self, wx.ID_ANY,(str)(self.counter)+"/0",wx.Point(-1,-1),wx.DefaultSize,0)
+      self.counter_text.SetForegroundColour('red')
+      
       self.reader=Txt_Reader()
       if os.path.exists(fname):
           mListBoxChoices = self.reader.read_file(fname)
@@ -97,12 +105,6 @@ class MyFrame(wx.Frame):
       
       self._maxFiles=len(self.reader._file_list) 
       
-      self.counter=0
-      self.selectedItems=list()
-      
-      self.counter_text=wx.StaticText(self, wx.ID_ANY,(str)(self.counter)+"/"+(str)(self._maxFiles),wx.Point(-1,-1),wx.DefaultSize,0)
-      self.counter_text.SetForegroundColour('red')
-      
       myBoxGridSizer=wx.BoxSizer(wx.VERTICAL)
       
       self.headerLabel = wx.StaticText(self, wx.ID_ANY,"JuMEG ListBox",wx.Point(-1,-1),wx.DefaultSize,0)
@@ -118,6 +120,8 @@ class MyFrame(wx.Frame):
       
       self.mListBox.Bind(wx.EVT_LISTBOX,self.select)
       self.mListBox.Bind(wx.EVT_MOTION,self.OnMouseMove)
+      
+      self.update_counter_text()
       
     
    @property
@@ -139,6 +143,7 @@ class MyFrame(wx.Frame):
             #self.mListBox.InsertItems(items=self.reader.read_file(file),pos=0)
             self.update_counter_text()
             self.mListBox.Bind(wx.EVT_LISTBOX,self.select)
+            self.mListBox.Bind(wx.EVT_MOTION,self.OnMouseMove)
       
    def OnMouseMove(self, event):
         # Event handler for mouse move event. Updates current position of cursor in data coordinates.
