@@ -38,10 +38,14 @@ class LbBtPanel(wx.Panel):
           myListBoxSizer.Add(self.btPanel,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL | wx.EXPAND,5)
           self.SetSizer(myListBoxSizer)
       else:
-          fname=self.GetParent().GetParent().OnOpen()
-          choices=self.GetParent().GetParent().reader.read_file(fname)
+          fname=self.frame.OnOpen()
+          choices=self.frame.reader.read_file(fname)
           self.updateChoices(choices)
-      
+   
+   @property
+   def frame(self):
+      return self.GetParent().GetParent()
+   
    def updateChoices(self,choices):
       self.mListBox.Clear()
       self.mListBox.AppendItems(choices)
