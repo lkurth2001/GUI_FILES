@@ -17,17 +17,20 @@ class ButtonPanel(wx.Panel):
       self._bt_print = wx.Button(self,label="Print",name=self.GetName()+".BT.PRINT")
       #self._bt_del = wx.Button(self,label="Delete Selected",name=self.GetName()+".BT.DEL")
       self._bt_clear = wx.Button(self,label="Clear",name=self.GetName()+".BT.CLEAR")
+      self._bt_apply = wx.Button(self,label="Apply",name=self.GetName()+".BT:APPLY")
       myButtonSizer=wx.BoxSizer(wx.HORIZONTAL)
       myButtonSizer.Add(self._bt_all,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       myButtonSizer.Add(self._bt_print,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       #myButtonSizer.Add(self._bt_del,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       myButtonSizer.Add(self._bt_clear,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
+      myButtonSizer.Add(self._bt_apply,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL,5)
       self.SetSizer(myButtonSizer)
       self.SetBackgroundColour("blue")
       
 class LbBtPanel(wx.Panel):
    def __init__(self,parent,choices):
       wx.Panel.__init__(self,parent,style=wx.BORDER_SUNKEN)
+      self.mListBox=None
       if len(choices)>0:
           myListBoxSizer=wx.BoxSizer(wx.VERTICAL)
           self.mListBox = wx.ListBox(self,wx.ID_ANY,choices=choices,style=wx.LB_MULTIPLE) 
@@ -47,8 +50,18 @@ class LbBtPanel(wx.Panel):
       return self.GetParent().GetParent()
    
    def updateChoices(self,choices):
-      self.mListBox.Clear()
-      self.mListBox.AppendItems(choices)
+      if self.mListBox:
+          self.mListBox.Clear()
+          self.mListBox.AppendItems(choices)
+      else:
+          myListBoxSizer=wx.BoxSizer(wx.VERTICAL)
+          self.mListBox = wx.ListBox(self,wx.ID_ANY,choices=choices,style=wx.LB_MULTIPLE) 
+          self.mListBox.SetFont(wx.Font(12,75,90,90,False,wx.EmptyString))
+          self.mListBox.SetToolTip("ListBox")
+          myListBoxSizer.Add(self.mListBox,1,wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND | wx.ALL,5)
+          self.btPanel=ButtonPanel(self)
+          myListBoxSizer.Add(self.btPanel,0,wx.ALIGN_CENTER_HORIZONTAL | wx.ALL | wx.EXPAND,5)
+          self.SetSizer(myListBoxSizer)
       
 class TreeCtrlPanel(wx.Panel):
     def __init__(self,parent):
@@ -67,8 +80,8 @@ class MyFrame(wx.Frame):
    def __init__(self,parent):
       wx.Frame.__init__(self,parent,id=wx.ID_ANY,title="JuMEG ListBox",pos=wx.DefaultPosition, size=wx.Size(500,400),style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
       
-      fname="intext_meeg_filelist.txt"
-      #fname=""
+      #fname="intext_meeg_filelist.txt"
+      fname=""
       
       self.Splitter=wx.SplitterWindow(self)
       
@@ -158,7 +171,7 @@ class MyFrame(wx.Frame):
       self.counter_text.SetLabel((str)(self.counter)+"/"+(str)(self._maxFiles))
    
    def select(self,event):
-    """Simulate CTRL-click"""
+    """Simulate CTRL-click on ListBox"""
     selection = self.mListBox.GetSelections()
     for i in selection:
         if i not in self.selectedItems:
