@@ -242,6 +242,8 @@ class MyFrame(wx.Frame):
          self.deleteSelectedItems()
       elif obj.GetName().endswith("BT.CLEAR"):
          self.deleteAll()
+      elif obj.GetName().endswith("BT:APPLY"):
+         self._TreePanel.SetBackgroundColour("green")
          
    def OnOpen(self, event=None):
        '''
