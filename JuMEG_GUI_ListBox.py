@@ -10,6 +10,11 @@ import wx
 from file_reader import Txt_Reader
 import os
 from pubsub import pub
+import jumeg_base_config
+import jumeg_base
+import jumeg_gui_wxlib_utils_controls
+import jumeg_gui_config
+
 
 class ButtonPanel(wx.Panel):
    def __init__(self,parent):
@@ -204,18 +209,6 @@ class MyFrame(wx.Frame):
       
       self.Splitter=wx.SplitterWindow(self)
       
-      """self.counter=0
-      self.selectedItems=list()
-      
-      self.counter_text=wx.StaticText(self, wx.ID_ANY,(str)(self.counter)+"/0",wx.Point(-1,-1),wx.DefaultSize,0)
-      self.counter_text.SetForegroundColour('red')"""
-      
-      """self.reader=Txt_Reader()
-      if os.path.exists(fname):
-          mListBoxChoices = self.reader.read_file(fname)
-      else:
-          mListBoxChoices = list()"""
-      
       self._LbBtPanel=LbBtPanel(self.Splitter,fname)
       
       #self._LbBtPanel.Bind(wx.EVT_BUTTON,self.ClickOnButton)
@@ -248,14 +241,13 @@ class MyFrame(wx.Frame):
       
       self.Centre(wx.BOTH)
       
-      """self.mListBox.Bind(wx.EVT_LISTBOX,self.select)
-      self.mListBox.Bind(wx.EVT_MOTION,self.OnMouseMove)"""
       
       #self.update_counter_text()
     
    def my_listener(self,message,arg2=None):
        if message=="apply":
-           self._TreePanel.SetBackgroundColour("green")
+           self._TreePanel=jumeg_gui_config.CtrlPanel(self.Splitter,fname="intext_config.yaml")
+           #self._TreePanel.SetBackgroundColour("green")
     
    @property
    def mListBox(self):
@@ -271,94 +263,6 @@ class MyFrame(wx.Frame):
          file=self.OnOpen()
          if file:
             pub.sendMessage("listBoxListener",message="update",arg2=file)
-      
-   """def OnMouseMove(self, event):
-        # Event handler for mouse move event. Updates current position of cursor in data coordinates.
-        
-        event.Skip()
-        # get mouse position in window
-        self.mousePos = self.ScreenToClient(wx.GetMousePosition())
-        x, y = self.mousePos.Get()
-        if self.mListBox.HitTest(x,y)!=wx.NOT_FOUND and len(self.reader._file_list)>1:
-         self.mListBox.SetToolTip(self.reader._file_list[self.mListBox.HitTest(x,y)-1])
-        
-   ef update_counter_text(self):
-      self._maxFiles=len(self.reader._file_list)
-      self.counter_text.SetLabel((str)(self.counter)+"/"+(str)(self._maxFiles))"""
-   
-   """def select(self,event):
-    selection = self.mListBox.GetSelections()
-    for i in selection:
-        if i not in self.selectedItems:
-            # add to list of selected items
-            self.selectedItems.append(i)
-            self.mListBox.Select(i)
-            self.counter+=1
-        elif len(selection) == 1:
-            # remove from list of selected items
-            self.selectedItems.remove(i)
-            self.mListBox.Deselect(i)
-            self.counter-=1
-
-    for i in self.selectedItems:
-        # actually select all the items in the list
-        self.mListBox.Select(i)
-        
-    if len(self.selectedItems)==self._maxFiles:
-        self.bt_all.SetLabel("Deselect All")
-    else:
-        self.bt_all.SetLabel("Select All")
-    self.update_counter_text()
-        
-        
-   def selectAll(self):
-      for i in range(self._maxFiles):
-         self.mListBox.SetSelection(i)
-         self.selectedItems.append(i)
-      self.bt_all.SetLabel("Deselect All")
-      self.counter=self._maxFiles
-      self.update_counter_text()
-   
-   def deselectAll(self):
-      for i in self.mListBox.GetSelections():
-         self.mListBox.Deselect(i)
-      self.selectedItems.clear()
-      self.bt_all.SetLabel("Select All")
-      self.counter=0
-      self.update_counter_text()
-      
-   def deleteSelectedItems(self):
-      if len(self.selectedItems)==0:
-         pass
-      else:
-         selection=self.mListBox.GetSelections()
-         selection.sort(reverse=True)
-         for i in selection:
-            self.mListBox.Delete(i)
-            self.reader._file_list.pop(i)
-         self.deselectAll()
-         
-   def deleteAll(self):
-      self.mListBox.Clear()
-      self.counter=0
-      self.counter_text.SetLabel((str)(self.counter)+"/0")
-      self.mListBox.SetToolTip("")
-      
-   def ClickOnButton(self,event):
-      obj=event.GetEventObject()
-      if obj.GetLabel()=="Select All":
-         self.selectAll()
-      elif obj.GetLabel()=="Deselect All":
-         self.deselectAll()
-      elif obj.GetName().endswith(".BT.PRINT"):
-         for i in self.selectedItems:
-            print(self.reader._file_list[i])
-      elif obj.GetName().endswith(".BT.DEL"):
-         self.deleteSelectedItems()
-      elif obj.GetName().endswith("BT.CLEAR"):
-         self.deleteAll()
-      elif obj.GetName().endswith("BT:APPLY"):
-         pub.sendMessage("frame_listener", message="apply") """
          
    def OnOpen(self, event=None):
        '''
