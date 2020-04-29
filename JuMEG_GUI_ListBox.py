@@ -90,7 +90,7 @@ class LbBtPanel(wx.Panel):
       elif obj.GetName().endswith("BT.CLEAR"):
          self.deleteAll()
       elif obj.GetName().endswith("BT:APPLY"):
-         pub.sendMessage("frame_listener", message="apply")
+         pub.sendMessage("tree_listener", message="apply",arg2="intext_config.yaml")
          
    def select(self,event):
         """Simulate CTRL-click on ListBox"""
@@ -189,8 +189,22 @@ class LbBtPanel(wx.Panel):
 class TreeCtrlPanel(wx.Panel):
     def __init__(self,parent):
       wx.Panel.__init__(self,parent)
-      self.SetBackgroundColour("red")
+      pub.subscribe(self.my_listener,"tree_listener")
+      myListBoxSizer=wx.BoxSizer(wx.VERTICAL)
+      self._TreePanel=jumeg_gui_config.CtrlPanel(self,fname="")
+      myListBoxSizer.Add(self._TreePanel,1,wx.ALIGN_CENTER_HORIZONTAL | wx.EXPAND | wx.ALL,5)
+      self.SetSizer(myListBoxSizer)
+      self._TreePanel.Hide()
       
+    def my_listener(self,message,arg2=None):
+       if message=="apply" and arg2:
+           #self._TreePanel=jumeg_gui_config.CtrlPanel(self.Splitter,fname="intext_config.yaml")
+           #os.system('python jumeg_gui_config.py &')
+           self._TreePanel._init_cfg(config=arg2)
+           self._TreePanel.Show()
+           self._TreePanel.Layout()
+           self.Layout()
+           
       
 class MyApp(wx.App):
    def OnInit(self):
@@ -202,7 +216,6 @@ class MyApp(wx.App):
 class MyFrame(wx.Frame):
    def __init__(self,parent):
       wx.Frame.__init__(self,parent,id=wx.ID_ANY,title="JuMEG ListBox",pos=wx.DefaultPosition, size=wx.Size(500,400),style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
-      pub.subscribe(self.my_listener,"frame_listener")
       
       fname="intext_meeg_filelist.txt"
       #fname=""
@@ -221,7 +234,7 @@ class MyFrame(wx.Frame):
       self._menubar=wx.MenuBar()
       open_menu=wx.Menu()
       load_item=wx.MenuItem(open_menu,id=1,text="load",kind=wx.ITEM_NORMAL)
-      open_menu.AppendItem(load_item)
+      open_menu.Append(load_item)
       self._menubar.Append(open_menu, 'Menu')
       self.SetMenuBar(self._menubar)
       self.Bind(wx.EVT_MENU,self.menuhandler)
@@ -244,10 +257,6 @@ class MyFrame(wx.Frame):
       
       #self.update_counter_text()
     
-   def my_listener(self,message,arg2=None):
-       if message=="apply":
-           self._TreePanel=jumeg_gui_config.CtrlPanel(self.Splitter,fname="intext_config.yaml")
-           #self._TreePanel.SetBackgroundColour("green")
     
    @property
    def mListBox(self):
